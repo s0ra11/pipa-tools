@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Episódios - PIPA Podcast</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #444;
+        }
+        
+        .hint {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .row > div {
+            flex: 1;
+        }
+        
+        /* Link builder */
+        .link-builder {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .link-builder h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .link-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .link-inputs input {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1e8449;
+        }
+        
+        /* Output section */
+        .output-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .output-section h2 {
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .copy-feedback {
+            color: #27ae60;
+            font-size: 14px;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .copy-feedback.show {
+            opacity: 1;
+        }
+        
+        /* Preview */
+        .preview-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .preview-card {
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .preview-date {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-description {
+            line-height: 1.6;
+        }
+        
+        .preview-description a {
+            color: #e74c3c;
+        }
+        
+        .description-full {
+            color: #555;
+        }
+        
+        /* Reference link section */
+        .reference-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h3 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .instructions code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎙️ Gerador de Episódios - PIPA Podcast</h1>
+    
+    <div class="instructions">
+        <h3>📝 Como usar:</h3>
+        <ol>
+            <li>Cole o <strong>Embed Code</strong> do Buzzsprout</li>
+            <li>Preencha o número do episódio e a data</li>
+            <li>Escreva a descrição. Para adicionar links, use <code>__texto do link__</code></li>
+            <li>Após escrever, clique em "Converter Links" e preencha as URLs</li>
+            <li>Copie o HTML gerado e cole no WordPress</li>
+        </ol>
+    </div>
+    
+    <div class="form-group">
+        <label>Embed Code do Buzzsprout</label>
+        <div class="hint">Cole aqui o código que aparece em "Copy and paste this code into your website"</div>
+        <textarea id="embedCode" placeholder='<div id="buzzsprout-player-18355922"></div><script src="https://www.buzzsprout.com/812414/episodes/18355922-conversa..."></script>'></textarea>
+    </div>
+    
+    <div class="form-group">
+        <div class="row">
+            <div>
+                <label>Número do Episódio</label>
+                <input type="number" id="episodeNumber" placeholder="30">
+            </div>
+            <div>
+                <label>Data de Publicação</label>
+                <div class="hint">Ex: 15 de Dezembro de 2025</div>
+                <input type="text" id="episodeDate" placeholder="15 de Dezembro de 2025">
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label>Descrição Curta (aparece sempre visível)</label>
+        <div class="hint">Use <code>__nome do artista__</code> para marcar onde vai ter link. Ex: <code>__Andréa Hygino__</code></div>
+        <textarea id="descShort" placeholder="No dia 06 de setembro de 2025, foi realizada a abertura das exposições do PIPA 2025... Os Artistas Premiados — __Andréa Hygino__, __Darks Miranda__ — participaram..."></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label>Descrição Expandida (aparece ao clicar "ver mais")</label>
+        <div class="hint">Opcional. Continuação do texto.</div>
+        <textarea id="descFull" placeholder="Na troca, os artistas falaram sobre suas produções e trajetórias..."></textarea>
+    </div>
+    
+    <div class="form-group">
+        <button class="btn btn-secondary" onclick="findLinks()">🔗 Converter Links</button>
+        <div id="linkBuilder" class="link-builder" style="display: none;">
+            <h4>Preencha as URLs para cada link:</h4>
+            <div id="linkInputs"></div>
+        </div>
+    </div>
+    
+    <div class="form-group reference-section">
+        <div class="checkbox-group">
+            <input type="checkbox" id="hasReference">
+            <label for="hasReference" style="margin: 0;">Este episódio tem link de referências?</label>
+        </div>
+        <div id="referenceFields" style="display: none; margin-top: 10px;">
+            <label>URL da página de referências</label>
+            <input type="text" id="referenceUrl" placeholder="https://www.premiopipa.com/2020/02/referencias-do-episodio...">
+        </div>
+    </div>
+    
+    <button class="btn btn-primary" onclick="generateHTML()" style="width: 100%; padding: 15px; font-size: 16px;">
+        ⚡ Gerar HTML
+    </button>
+    
+    <div class="preview-section">
+        <h2>👁️ Preview</h2>
+        <div class="preview-card">
+            <div class="preview-date" id="previewDate">Data do episódio</div>
+            <div class="preview-description" id="previewDesc">A descrição aparecerá aqui...</div>
+        </div>
+    </div>
+    
+    <div class="output-section">
+        <h2>
+            📋 HTML Gerado
+            <span>
+                <button class="btn btn-success btn-small" onclick="copyToClipboard()">Copiar</button>
+                <span class="copy-feedback" id="copyFeedback">✓ Copiado!</span>
+            </span>
+        </h2>
+        <div id="output">O código HTML aparecerá aqui após clicar em "Gerar HTML"</div>
+    </div>
+
+    <script>
+        // Store links
+        let linkMap = {};
+        
+        // Toggle reference fields
+        document.getElementById('hasReference').addEventListener('change', function() {
+            document.getElementById('referenceFields').style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Find __text__ patterns and create input fields for URLs
+        function findLinks() {
+            const shortDesc = document.getElementById('descShort').value;
+            const fullDesc = document.getElementById('descFull').value;
+            const allText = shortDesc + ' ' + fullDesc;
+            
+            const pattern = /__([^_]+)__/g;
+            const matches = [...allText.matchAll(pattern)];
+            
+            if (matches.length === 0) {
+                alert('Nenhum link encontrado. Use __texto__ para marcar links.\n\nExemplo: __Andréa Hygino__');
+                return;
+            }
+            
+            const linkBuilder = document.getElementById('linkBuilder');
+            const linkInputs = document.getElementById('linkInputs');
+            linkInputs.innerHTML = '';
+            
+            // Get unique link texts
+            const uniqueLinks = [...new Set(matches.map(m => m[1]))];
+            
+            uniqueLinks.forEach(linkText => {
+                const div = document.createElement('div');
+                div.className = 'link-inputs';
+                div.innerHTML = `
+                    <input type="text" value="${linkText}" readonly style="flex: 0.4; background: #eee;">
+                    <input type="text" placeholder="https://www.premiopipa.com/..." 
+                           data-link-text="${linkText}" 
+                           value="${linkMap[linkText] || ''}"
+                           onchange="linkMap['${linkText}'] = this.value">
+                `;
+                linkInputs.appendChild(div);
+            });
+            
+            linkBuilder.style.display = 'block';
+        }
+        
+        // Extract episode ID from embed code
+        function extractEpisodeId(embedCode) {
+            const match = embedCode.match(/episodes\/(\d+)/);
+            return match ? match[1] : null;
+        }
+        
+        // Convert __text__ to <a> tags
+        function convertLinks(text) {
+            return text.replace(/__([^_]+)__/g, (match, linkText) => {
+                const url = linkMap[linkText];
+                if (url) {
+                    return `<a href="${url}" rel="noopener" target="_blank">${linkText}</a>`;
+                }
+                return linkText;
+            });
+        }
+        
+        // Generate the final HTML
+        function generateHTML() {
+            const embedCode = document.getElementById('embedCode').value.trim();
+            const episodeNumber = document.getElementById('episodeNumber').value.trim();
+            const episodeDate = document.getElementById('episodeDate').value.trim();
+            const descShort = document.getElementById('descShort').value.trim();
+            const descFull = document.getElementById('descFull').value.trim();
+            const hasReference = document.getElementById('hasReference').checked;
+            const referenceUrl = document.getElementById('referenceUrl').value.trim();
+            
+            // Validate
+            if (!embedCode) {
+                alert('Por favor, cole o Embed Code do Buzzsprout');
+                return;
+            }
+            
+            const episodeId = extractEpisodeId(embedCode);
+            if (!episodeId) {
+                alert('Não foi possível extrair o ID do episódio do Embed Code. Verifique se o código está correto.');
+                return;
+            }
+            
+            if (!episodeNumber || !episodeDate || !descShort) {
+                alert('Por favor, preencha todos os campos obrigatórios (número, data e descrição curta)');
+                return;
+            }
+            
+            // Convert links in descriptions
+            const shortWithLinks = convertLinks(descShort);
+            const fullWithLinks = convertLinks(descFull);
+            
+            // Build HTML
+            let html = `        <!-- Episode ${episodeNumber} -->
+        <div class="episode-card">
+            <div class="episode-player">
+                [buzzsprout episode='${episodeId}' player='true']
+            </div>
+            
+            <div class="episode-info">
+                <div class="episode-header">
+                    <span class="episode-date">${episodeDate}</span>
+                </div>
+                
+                <div class="episode-description">
+                    <p class="description-text">
+                        ${shortWithLinks}`;
+            
+            if (fullWithLinks) {
+                html += `
+                        <span class="description-full">
+${fullWithLinks}</span>`;
+            }
+            
+            html += `
+                    </p>`;
+            
+            if (hasReference && referenceUrl) {
+                html += `
+                    
+                    <div class="reference-link">
+                        <a class="platform-button" href="${referenceUrl}">
+                            Veja aqui as referências feitas neste episódio
+                        </a>
+                    </div>`;
+            }
+            
+            html += `
+                </div>
+            </div>
+        </div>`;
+            
+            // Update output
+            document.getElementById('output').textContent = html;
+            
+            // Update preview
+            document.getElementById('previewDate').textContent = episodeDate;
+            let previewHtml = shortWithLinks;
+            if (fullWithLinks) {
+                previewHtml += ` <span class="description-full">${fullWithLinks}</span>`;
+            }
+            document.getElementById('previewDesc').innerHTML = previewHtml;
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2000);
+            });
+        }
+        
+        // Auto-generate on input change (for preview)
+        ['embedCode', 'episodeNumber', 'episodeDate', 'descShort', 'descFull'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                // Update preview only if we have minimum data
+                const date = document.getElementById('episodeDate').value;
+                const desc = document.getElementById('descShort').value;
+                if (date && desc) {
+                    document.getElementById('previewDate').textContent = date;
+                    const shortWithLinks = convertLinks(desc);
+                    const fullWithLinks = convertLinks(document.getElementById('descFull').value);
+                    let previewHtml = shortWithLinks;
+                    if (fullWithLinks) {
+                        previewHtml += ` <span class="description-full">${fullWithLinks}</span>`;
+                    }
+                    document.getElementById('previewDesc').innerHTML = previewHtml;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
